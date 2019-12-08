@@ -15,17 +15,17 @@ PTalt = removevars(PT,{'Var1','ID','fluidIQ','Extraversion','Openness','Conscien
 [idx] = fscmrmr(PTalt, 'Emotional_Stability');
 v = zeros(1,57);
 novo = [idx;v];
-[l,c] = size(novo);
-A = [l,c];
+[l,c] Aa = size(novo);
+
 for i = 1:c
     
-    A(1,i) = num2str(novo(1,i));
+    
 
-end
 
 for i = 1:57
     for j = 1:57
         if idx(i) == j
+            A(1,j) = num2str(novo(1,i));
             A(2,j) = PTalt.Properties.VariableNames{i};
         end
     end
