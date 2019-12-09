@@ -1,7 +1,4 @@
-%% read data
-data = readtable('dataSetAI_2019.xltx');
-dataOrg = dar
-
+function [sortedscore_ES, sortedscore_Ext, sortedscore_op, sortedscore_cs, sortedscore_ag] = featSel(data)
 %% Score for Emotional_Stability
 dataAlt = removevars(data,{'Var1','ID','fluidIQ','Extraversion','Openness','Conscientiousness','Agreeableness'});
 dataAlt2 = removevars(data,{'Var1','ID','fluidIQ','Extraversion','Openness','Conscientiousness','Agreeableness', 'Emotional_Stability'});
@@ -147,69 +144,4 @@ end
 %%Sort Score of Conscientiousness Data
 [~,idx3] = sort(str2double(score_ag(2,:))); 
 sortedscore_ag = score_ag(:,idx3);
-
-%% Final feature selection
-
-
-
-%% Determine Features matrix and Target matrix
-T = data(:,7:11);
-P = data(:,3:5);
-P2 = data(:,12:end);
-P = cat(2,P,P2);
-
-% convert table to matrix
-T = table2array(T);
-P = table2array(P);
-
-% balance data
-normalized = normalize(P,'range');
-% NÃO ESTÁ A SER USADO! MAS ACHO Q DEVE ?
-
-% split data - 90% for training and validation, 10% for testing
-PTreino = P(1:floor(137*0.9),:);
-TTreino = T(1:floor(137*0.9),:);
-PTeste = P(floor(137*0.9)+1:end,:);
-TTeste = T(floor(137*0.9)+1:end,:);
-
-% train networks for each personality trait
-netN = classifier(PTreino,TTreino(:,1));
-save('trainedNetN','netN');
-netE = classifier(PTreino,TTreino(:,2));
-save('trainedNetE','netE');
-netO = classifier(PTreino,TTreino(:,3));
-save('trainedNetO','netO');
-netC = classifier(PTreino,TTreino(:,4));
-save('trainedNetC','netC');
-netA = classifier(PTreino,TTreino(:,5));
-save('trainedNetA','netA');
-
-% test each network
-[resultsN, sensN, especN] = testNet (netN, PTeste, TTeste(:,1));
-[resultsE, sensE, especE] = testNet (netE, PTeste, TTeste(:,2));
-[resultsO, sensO, especO] = testNet (netO, PTeste, TTeste(:,3));
-[resultsC, sensC, especC] = testNet (netC, PTeste, TTeste(:,4));
-[resultsA, sensA, especA] = testNet (netA, PTeste, TTeste(:,5));
-
-% print results
-disp("Results");
-disp("Emotional Stability ", resultsN);
-disp("Extraversion ", resultsE);
-disp("Openness ", resultsO);
-disp("Conscientiousness ", resultsC);
-disp("Agreeableness ", resultsA);
-disp("---------------");
-disp("Sensitivity - Emotional Stability " + sensN);
-disp("Specificity - da Emotional Stability " + especN);
-disp("----");
-disp("Sensitivity - Extraversion " + sensE);
-disp("Specificity - Extraversion " + especE);
-disp("----");
-disp("Sensitivity - Openness " + sensO);
-disp("Specificity - Openness " + especO);
-disp("----");
-disp("Sensitivity - Conscientiousness " + sensC);
-disp("Specificity - Conscientiousness " + especC);
-disp("----");
-disp("Sensitivity - Agreeableness " + sensA);
-disp("Specificity - Agreeableness " + especA);
+end

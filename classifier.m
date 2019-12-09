@@ -1,9 +1,22 @@
-function trainedNet = classifier(PTreino,TTreino)
+%function trainedNet = classifier(PTreino,TTreino)
+
+data = readtable('dataSetAI_2019.xltx');
+T = data(:,7:11);
+P = data(:,3:5);
+P2 = data(:,12:end);
+P = cat(2,P,P2);
+T = table2array(T);
+P = table2array(P);
+P = normalize(P,'range');
+PTreino = P(1:floor(137*0.9),:);
+TTreino = T(1:floor(137*0.9),:);
+TTreino = TTreino(:,1);
+
 
 trainFunc = 'traingd';
 transferFunc = 'logsig';
 
-net = feedforwardnet(2,trainFunc);
+net = feedforwardnet(10,trainFunc);
 
 % Configuração das Camadas Escondidas
 
@@ -22,7 +35,6 @@ net.trainParam.goal = 1e-9;
 net.divideParam.trainRatio = 80/100;
 net.divideParam.valRatio = 20/100;
 
-trainedNet = train(net,PTreino',TTreino);
-
-save('trainedNet','trainedNet');
-end
+PTreino = PTreino';
+trainedNet = train(net,PTreino,TTreino);
+%end
