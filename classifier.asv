@@ -1,0 +1,70 @@
+function net = classifier(P,T)
+
+nr_neuronios = nr_neuronios(1:camadas);
+  
+net = feedforwardnet(5,trainFunc);
+
+%         Configuração das Camadas Escondidas
+
+if camadas == 1
+
+    net.numLayers = 2;
+    net.layers{1}.transferFcn = transferFunc{1};
+
+
+elseif camadas == 2
+
+    net.numLayers = 3;
+    net.layers{1}.transferFcn = transferFunc{1};
+    net.layers{2}.transferFcn = transferFunc{2};
+
+elseif camadas == 3
+
+    net.numLayers = 4;
+    net.layers{1}.transferFcn = transferFunc{1};
+    net.layers{2}.transferFcn = transferFunc{2};
+    net.layers{3}.transferFcn = transferFunc{3};
+
+end
+
+
+%Parametros de Treino
+net.trainParam.epochs = 1000;
+net.trainParam.min_grad = 10e-9;
+net.trainParam.lr = 0.01;
+net.performFcn = 'msereg';
+net.trainParam.max_fail = 100;
+net.trainParam.goal = 1e-9;
+
+
+%Divisão do Set Balanceado para treino e validação
+
+net.divideParam.trainRatio = 85/100;
+net.divideParam.valRatio = 15/100;
+
+
+
+%Dimensões das classes
+
+dim_interictal = nnz(find(all(T==[1 0 0 0]')));
+dim_preictal = nnz(find(all(T==[0 1 0 0]')));
+dim_ictal = nnz(find(all(T==[0 0 1 0]')));
+dim_posictal = nnz(find(all(T==[0 0 0 1]')));
+
+%Dimensão do Set
+dim_total = dim_interictal + dim_preictal + dim_ictal + dim_posictal;
+
+%Formular o vetor de Pesos EW 
+
+p_ii = dim_total/dim_interictal;
+p_pre = dim_total/dim_preictal;
+p_pos = dim_total/dim_posictal;
+p_i = dim_total/dim_ictal;
+
+EW = all(T==[1 0 0 0]')*p_ii + all(T==[0 1 0 0]')*p_pre + all(T==[0 0 1 0]')*p_i + all(T==[0 0 0 1]')*p_pos;
+
+trained_network = train(net,P_balanced2,T_balanced,[],[],EW,'UseParallel','yes','UseGPU','yes');
+
+
+save('trainedNet','trained_network');
+end
