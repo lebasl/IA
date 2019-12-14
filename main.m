@@ -1,6 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Eduardo Vicente 2016231711 % 
-% Isabel Carvalho 2016212943 %
+%                - Artificial Intelligence 2019/2020 -                  % 
+%                   Eduardo Vicente 2016231711 %                  %
+%                   Isabel Carvalho 2016212943 %                    %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% read data
 data = readtable('dataSetAI_2019.xltx');
@@ -59,7 +60,7 @@ T = table2array(T);
 %split data - 90% for training and validation, 10% for testing
 [PTr_ag, PTr_cs, PTr_es, PTr_ext, PTr_op, PTe_ag, PTe_cs, PTe_es, PTe_ext, PTe_op] = splitData(P_ag, P_cs, P_es, P_ext, P_op); 
 TTreino = T(1:floor(137*0.9),:);
-TTeste = T(1:floor(137*0.9),:);
+TTeste = T(1:floor(137*0.1)+1,:);
 
 %% Networks' training
 % train networks for each personality trait
@@ -75,31 +76,48 @@ netA = classifier(PTr_ag,TTreino(:,5));
 save('trainedNetA','netA');
 
 %% Networks' testing
-[resultsN, sensN, especN] = testNet (netN, PTe_es, TTeste(:,1));
-[resultsE, sensE, especE] = testNet (netE, PTe_ext, TTeste(:,2));
-[resultsO, sensO, especO] = testNet (netO, PTe_op, TTeste(:,3));
-[resultsC, sensC, especC] = testNet (netC, PTe_cs, TTeste(:,4));
-[resultsA, sensA, especA] = testNet (netA, PTe_ag, TTeste(:,5));
+[test_resultsN] = testNet (netN, PTe_es, TTeste(:,1));
+[test_resultsE] = testNet (netE, PTe_ext, TTeste(:,2));
+[test_resultsO] = testNet (netO, PTe_op, TTeste(:,3));
+[test_resultsC] = testNet (netC, PTe_cs, TTeste(:,4));
+[test_resultsA] = testNet (netA, PTe_ag, TTeste(:,5));
 
+
+%% Final Assumptions
+
+[~,nc] = size(test_resultsN);
+
+final_results = zeros(nc,5);
+
+final_results(:,1) = test_resultsN';
+final_results(:,2) = test_resultsE';
+final_results(:,3) = test_resultsO';
+final_results(:,4) = test_resultsC';
+final_results(:,5) = test_resultsA';
+
+
+[final] = transform_results(final_results);
+[initial] = transform_results(TTeste);
 %% Results
-disp("Results");
-disp("Emotional Stability " + num2str(resultsN));
-disp("Extraversion " + num2str(resultsE));
-disp("Openness " + num2str(resultsO));
-disp("Conscientiousness " + num2str(resultsC));
-disp("Agreeableness " + num2str(resultsA));
-disp("---------------");
-disp("Sensitivity - Emotional Stability " + num2str(sensN));
-disp("Specificity - da Emotional Stability " + num2str(especN));
-disp("----");
-disp("Sensitivity - Extraversion " + num2str(sensE));
-disp("Specificity - Extraversion " + num2str(especE));
-disp("----");
-disp("Sensitivity - Openness " + num2str(sensO));
-disp("Specificity - Openness " + num2str(especO));
-disp("----");
-disp("Sensitivity - Conscientiousness " + num2str(sensC));
-disp("Specificity - Conscientiousness " + num2str(especC));
-disp("----");
-disp("Sensitivity - Agreeableness " + num2str(sensA));
-disp("Specificity - Agreeableness " + num2str(especA));
+[nl,~] = size(final);
+performanceN =0;
+performanceE =0;
+performanceO =0;
+performanceC =0;
+performanceA =0;
+for i=1:nl
+       
+    
+      performanceN = performanceN + ((abs(final(i,1) - initial(i,1)) / final(i,1)) * 100) ; 
+      performanceE = performanceE + ((abs(final(i,2) - initial(i,2)) / final(i,2)) * 100) ; 
+      performanceO = performanceO + ((abs(final(i,3) - initial(i,3)) / final(i,3)) * 100) ; 
+      performanceC = performanceC + ((abs(final(i,4) - initial(i,4)) / final(i,4)) * 100) ; 
+      performanceA = performanceA + ((abs(final(i,5) - initial(i,5)) / final(i,5)) * 100) ; 
+    
+end
+
+performanceN = performanceN/nl;
+performanceE = performanceE/nl;
+performanceO = performanceO/nl;
+performanceC = performanceC/nl;
+performanceA = performanceA/nl;
