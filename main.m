@@ -76,14 +76,18 @@ netA = classifier(PTr_ag,TTreino(:,5));
 save('trainedNetA','netA');
 
 %% Networks' testing
-[test_resultsN] = testNet (netN, PTe_es, TTeste(:,1));
-[test_resultsE] = testNet (netE, PTe_ext, TTeste(:,2));
-[test_resultsO] = testNet (netO, PTe_op, TTeste(:,3));
-[test_resultsC] = testNet (netC, PTe_cs, TTeste(:,4));
-[test_resultsA] = testNet (netA, PTe_ag, TTeste(:,5));
+%Testing and return of the 5 NN trained before
+
+[test_resultsN] = testNet (netN, PTe_es);
+[test_resultsE] = testNet (netE, PTe_ext);
+[test_resultsO] = testNet (netO, PTe_op);
+[test_resultsC] = testNet (netC, PTe_cs);
+[test_resultsA] = testNet (netA, PTe_ag);
 
 
 %% Final Assumptions
+%Pos-Processing of the results in terms of performance, ie, calculation of
+%the mean error between the results and the actual values
 
 [~,nc] = size(test_resultsN);
 
@@ -98,7 +102,10 @@ final_results(:,5) = test_resultsA';
 
 [final] = transform_results(final_results);
 [initial] = transform_results(TTeste);
+
 %% Results
+%percentage performance based in the dif error between the measured values and the theoretical values
+
 [nl,~] = size(final);
 performanceN =0;
 performanceE =0;
@@ -116,8 +123,8 @@ for i=1:nl
     
 end
 
-performanceN = performanceN/nl;
-performanceE = performanceE/nl;
-performanceO = performanceO/nl;
-performanceC = performanceC/nl;
-performanceA = performanceA/nl;
+performanceN = 100 - performanceN/nl; 
+performanceE = 100 - performanceE/nl;
+performanceO = 100 - performanceO/nl;
+performanceC = 100 - performanceC/nl;
+performanceA = 100 - performanceA/nl;
